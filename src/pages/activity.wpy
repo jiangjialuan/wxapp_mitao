@@ -1,0 +1,564 @@
+<style lang="less" scoped>
+page{
+    background: #ea5756;
+    overflow:hidden;
+}
+.activity-page {
+    position: relative;
+    overflow:hidden;
+    .bg{
+        width: 750rpx;
+        height: 1205rpx;
+        display: block;
+    }
+    .btn-area{
+        position:absolute;
+        bottom:90rpx;
+        width:100%;
+        .btn{
+            width: 520rpx;
+            height: 90rpx;
+            background: #ff3672;
+            border-radius: 45rpx;
+            line-height: 90rpx;
+            margin: 0 auto 32rpx;
+            display: block;
+            color: #fff;
+            font-size: 36rpx;
+            border: none;
+            &.createImg{
+                background: #3eb000;
+            }
+            &.bottom90{
+                margin-bottom:122rpx;
+            }
+        }
+    }
+    .activity_body{
+        position:absolute;
+        top:400rpx;
+        width:76%;
+        left:13%;
+        color:#555;
+        .activity_title{
+            font-size:40rpx;
+            border-bottom:2px solid #555;
+            text-align:center;
+            width:180rpx;
+            margin:20rpx auto 40rpx;
+            line-height:65rpx;
+        }
+        text{
+            font-size:34rpx;
+            display:block;
+            margin-bottom:20px;
+        }
+    }
+    .textCont{
+        position:absolute;
+        text-align:center;
+        z-index: 10;
+        bottom:40rpx;
+        width:100%;
+        color:#999;
+        font-size:20rpx;
+    }
+    .pop{
+        position:absolute;
+        padding: 40rpx 60rpx 60rpx;
+        border-radius: 5rpx;
+        z-index: 10;
+        background: #fff;
+        top: 30rpx;
+        left: 50%;
+        transform: translate(-50%,0);
+        .close-btn{
+            width: 100rpx;
+            height: 100rpx;
+            position: absolute;
+            right: 0;
+            top: 0;
+            justify-content:center;
+            image{
+                width: 52rpx;
+                height: 52rpx;
+            }
+        }
+        .pop-title{
+            color:#555;
+            font-size: 40rpx;
+            margin-bottom: 30rpx;
+            text-align: center;
+        }
+        .sub-title{
+            color:#999;
+            font-size: 24rpx;
+            margin-bottom: 52rpx;
+            text-align: center;
+        }
+        .input-txt, .confirm-btn{
+            width: 564rpx;
+            height: 90rpx;
+            line-height: 90rpx;
+            border-radius: 5rpx;
+        }
+        .input-txt{
+            background: #f2f2f2;
+            margin-bottom: 40rpx;
+            input{
+                flex: 1;
+                padding: 0 32rpx;
+            }
+            .code-btn{
+                width:180rpx;
+                text-align:center;
+                border: none;
+                border-left: 3rpx solid #555;
+                height: 48rpx;
+                line-height: 48rpx;
+                color: #555;
+                font-size: 24rpx;
+                border-radius: 0;
+                background:transparent;
+            }
+            &:last-child{
+                margin-bottom: 78rpx;
+            }
+        }
+        .confirm-btn{
+            background: #ea5756;
+            color: #fff;
+            font-size: 36rpx;
+            text-align: center;
+            margin-top: 78rpx;
+            border: none;
+        }
+    }
+}
+
+</style>
+<template>
+    <view class="activity-page">
+        <image src="../images/activity/bg.jpg" class="bg"/>
+        <view class="activity_body" wx:if="{{userInfo.is_tbk==1}}">
+            <view class="activity_title">邀请规则</view>
+            <view class="activity_text">
+                <text>1、转发该页面，可以邀请其它人使用</text>
+                <text>2、邀请成功后，当被邀请人产生订单时，可获得部分佣金</text>
+                <text>3、每月21号可提现上月结算订单佣金</text>
+            </view>
+        </view>
+        <view class="activity_body" wx:if="{{userInfo.is_tbk==2}}">
+            <view class="activity_title">邀请规则</view>
+            <view class="activity_text">
+                <text>1、转发该页面，可以邀请其它人使用</text>
+                <text>2、邀请成功后，则被邀请人也可以享受佣金优惠</text>
+                <text>3、每月21号可提现上月结算订单佣金</text>
+            </view>
+        </view>
+        <view class="activity_body" wx:if="{{userInfo.is_tbk==0}}">
+             <view class="activity_title">加入福利</view>
+             <view class="activity_text">
+                 <text>1、发现许多商品隐藏的优惠券</text>
+                 <text>2、买绝大多数商品都有不同程度的返现</text>
+                 <text>3、每月21号可提现上月结算订单佣金</text>
+             </view>
+        </view>
+        <view class="btn-area">
+            <view wx:if="{{userInfo.is_tbk==1 || userInfo.is_tbk==2}}">
+                <button class="btn {{createImgShow?'':'bottom90'}}" open-type="share" plain="true" wx:if="{{canIShare}}" data-id="{{item.id}}" disabled="{{creatImgDisable}}" >
+                    我要推广
+                </button>
+                <button class="btn {{createImgShow?'':'bottom90'}}" @tap="shareTips" disabled="{{creatImgDisable}}"  wx:else>
+                    我要推广
+                </button>
+            </view>
+            <view class="btn {{createImgShow?'':'bottom90'}}" @tap="openPop" wx:if="{{userInfo.is_tbk==0}}">我要赚佣金</view>
+            <button class="btn createImg {{createImgShow ? 'displayShow' : 'hidden'}}" @tap="createImg" disabled="{{creatImgDisable}}" wx:if="{{userInfo.display_poster==1}}" >生成推广海报</button>
+
+        </view>
+        <view class="pop {{isShow ? '' : 'hidden'}}">
+            <view class="close-btn flex" @tap="close">
+                <image src="../images/close.png"/>
+            </view>
+            <view class="pop-title">成为淘客</view>
+            <view class="sub-title">为了获得推广权限和保障佣金权益，请验证手机号</view>
+            <view class="input-txt flex">
+                <input type="number" placeholder="请填写您的手机号" value="{{phoneNumber}}" @input="handlePhoneNumber" focus="{{isShow}}"/>
+            </view>
+            <view class="input-txt flex">
+                <input type="number" placeholder="请填写短信验证码" value="{{codeNumber}}" @input="handleCodeNumber"/>
+                <button class="code-btn" @tap="sendCode" disabled="{{codeDisabled}}" plain="true">{{codeTxt}}</button>
+            </view>
+            <button class="confirm-btn" @tap="confirm" disabled="{{disabled}}" plain="true">提交</button>
+        </view>
+        <view class="textCont">交易完成即可得佣金，当月佣金次月21日可提现</view>
+        <view style="opacity:0;">
+                <canvas canvasId="identify" style="width:750rpx;height:3301rpx;position:absolute;left:10750rpx;top:0rpx;"/>
+        </view>
+    </view>
+</template>
+<script>
+import wepy from 'wepy';
+import api from '../common/api';
+import store from '../common/store';
+let max = 30, interval = null;
+export default class Activity extends wepy.page {
+    config = {
+        'navigationBarTitleText': '米淘联盟招募令来啦---佣金高、爆款多、服务好'
+    };
+    data = {
+        userInfo: {},
+        isShow: false,
+        phoneNumber: '',
+        codeNumber: '',
+        disabled: false,
+        codeDisabled: false,
+        codeTxt: '获取验证码',
+        canIShare: wx.canIUse && wx.canIUse('button.open-type.share') || false,
+        is_tbk:'',
+        from:'',
+        creatImgDisable:false,
+        width:'',
+        height:'',
+        createImgShow:false
+    };
+
+    validate() {
+        let msg;
+        if (!this.phoneNumber) {
+            return wx.showToast({
+                image: '../images/fail.png',
+                title: "请填写您的手机号码！"
+            });
+        }
+        if (!this.codeNumber) {
+            return wx.showToast({
+                image: '../images/fail.png',
+                title: "请填写短信验证码！"
+            });
+        }
+        return true;
+    }
+
+    validateCode() {
+        let msg;
+        if (!this.phoneNumber) {
+            return wx.showToast({
+                image: '../images/fail.png',
+                title: "请填写您的手机号码！"
+            });
+        }
+        return true;
+    }
+
+    renderCode() {
+        interval = setInterval(()=>{
+            max--;
+            this.codeTxt = `${max}s`;
+            if(max <= 0){
+                max = 30;
+                this.codeTxt = '获取验证码';
+                this.codeDisabled = false;
+                clearInterval(interval);
+                interval = null;
+            }
+            this.$apply();
+        },1000);
+    }
+
+    methods = {
+        close(){
+            this.isShow = false;
+            this.$apply();
+        },
+        openPop(){
+            this.isShow = true;
+            this.$apply();
+        },
+        sendCode(){
+            if (!this.validateCode()) return;
+            this.codeDisabled = true;
+            this.$apply();
+            api.request({
+                url: api.sendCode,
+                data: {
+                    act: 5,
+                    mobile_phone: this.phoneNumber
+                }
+            }).then(json => {
+                this.codeTxt = `${max}s`;
+                this.renderCode();
+                this.$apply();
+            }).catch(msg=>{
+                this.codeDisabled = false;
+                this.$apply();
+                wx.showToast({
+                    image: '../images/fail.png',
+                    title: msg
+                });
+            });
+        },
+        confirm(){
+            let uid = api.from_id ? api.from_id : this.userInfo.uid;
+            if (!this.validate() || this.disabled) return;
+            this.disabled = true;
+            this.$apply();
+            api.request({
+                url: api.join,
+                data: {
+                    act: 1,
+                    mobile_phone: this.phoneNumber,
+                    ticket_code: this.codeNumber,
+                    from_uid: uid
+                },
+                method: 'POST'
+            }).then(json => {
+                wx.showToast({
+                    title: '恭喜你成为淘客'
+                });
+                this.userInfo.is_tbk = json.is_tbk;
+                this.is_tbk=json.is_tbk;
+                this.isShow = false;
+                this.disabled = false;
+                this.$apply();
+                wx.setStorageSync('userInfo',this.userInfo);
+                wx.switchTab({
+                    url:'/pages/index'
+                });
+            }).catch(msg=>{
+                this.disabled = false;
+                this.$apply();
+                wx.showToast({
+                    image: '../images/fail.png',
+                    title: msg
+                });
+            });
+        },
+        handlePhoneNumber(e) {
+            this.phoneNumber = e.detail.value;
+            this.$apply();
+        },
+        handleCodeNumber(e) {
+            this.codeNumber = e.detail.value;
+            this.$apply();
+        },
+        shareTips(){
+            wx.showModal({
+                title: '提示',
+                showCancel: false,
+                content: '由于微信版本过低，暂不支持该功能，请升级微信或者点击右上角进行转发'
+            });
+        },
+        createImg(){
+          wx.showLoading({
+            title: '正在生成……',
+          })
+           var uid= this.userInfo.is_tbk ? this.userInfo.uid : api.from_id;
+           wx.request({
+                url: api.getWxacodeunlimit+'?buid='+api.buid+'&uid='+uid+'&type=1',
+                //url: 'http://www.yimizhibo.tv/weixin/authorization/getWxacodeunlimit?buid=12481&uid='+uid+'&type=1',
+                success: (resk)=> {
+                  this.creatImgDisable=true;
+                  this.$apply();
+                  wx.downloadFile({
+                    url: resk.data.data.url,
+                    success: (resloadimg)=> {
+                      if (resloadimg.statusCode == 200) {
+                                wx.saveFile({
+                                    tempFilePath: resloadimg.tempFilePath,
+                                    success:(ressavefile)=> {
+                                        wx.saveImageToPhotosAlbum({
+                                            filePath: ressavefile.savedFilePath,
+                                            success:(ressaveimg)=> {
+                                                wx.hideLoading()
+                                                wx.showToast({
+                                                    title: '保存成功！'
+                                                });
+                                                this.creatImgDisable=false;
+                                                this.$apply();
+                                                wx.getSavedFileList({
+                                                  success: (res)=> {
+                                                    if (res.fileList.length > 0){
+                                                      wx.removeSavedFile({
+                                                        filePath: res.fileList[0].filePath,
+                                                        complete: (res)=> {
+                                                        }
+                                                      })
+                                                    }
+                                                  }
+                                                })
+                                            },
+                                            fail:(ressaveimg)=> {
+                                                wx.openSetting({
+                                                    success:(opset)=>{
+                                                        if(opset.authSetting["scope.writePhotosAlbum"]){
+                                                            wx.saveImageToPhotosAlbum({
+                                                                 filePath: ressavefile.savedFilePath,
+                                                                 success:(ressaveimg)=> {
+                                                                     wx.hideLoading()
+                                                                     wx.showToast({
+                                                                          title: '保存成功！'
+                                                                     });
+                                                                     this.creatImgDisable=false;
+                                                                     this.$apply();
+                                                                     wx.getSavedFileList({
+                                                                          success: (res)=> {
+                                                                               if (res.fileList.length > 0){
+                                                                                    wx.removeSavedFile({
+                                                                                         filePath: res.fileList[0].filePath,
+                                                                                         complete: (res)=> { }
+                                                                                    })
+                                                                               }
+                                                                          }
+                                                                     })
+                                                                 }
+                                                            });
+                                                        }else{
+                                                            wx.showToast({
+                                                                title: '保存失败！'
+                                                            });
+                                                        }
+                                                    },
+                                                    fail:(opset)=>{
+                                                        wx.showToast({
+                                                            title: '保存失败！'
+                                                        });
+                                                        console.log(opset,"fail");
+                                                    }
+                                                });
+                                                wx.hideLoading()
+                                                this.creatImgDisable=false;
+                                                this.$apply();
+                                            }
+                                        })
+                                    },
+                                    fail:(e)=> {
+                                        this.creatImgDisable=false;
+                                        wx.hideLoading()
+                                        this.$apply();
+                                        wx.getSavedFileList({
+                                            success: (res)=> {
+                                                if (res.fileList.length > 0){
+                                                    wx.removeSavedFile({
+                                                        filePath: res.fileList[0].filePath,
+                                                        complete: (res)=> {
+                                                          console.log(res)
+                                                        }
+                                                    })
+                                                }
+                                            }
+                                        })
+                                    }
+                                });
+
+                      }
+            },
+            fail:(res)=>{
+                this.creatImgDisable=false;
+                wx.hideLoading()
+                this.$apply();
+                wx.showToast({
+                     title: '下载失败！'
+                });
+            }
+          });
+                }
+           })
+
+        }
+    };
+
+    showLoading() {
+        wx.showToast({
+            title: '正在加载...',
+            icon: 'loading',
+            duration: 10000
+        });
+    }
+
+    onShow(){
+    }
+
+    resetData(){
+        this.isShow = false;
+        this.phoneNumber = '';
+        this.codeNumber = '';
+        this.disabled = false;
+        max = 30;
+        this.codeTxt = '获取验证码';
+        this.codeDisabled = false;
+        clearInterval(interval);
+        interval = null;
+        this.createImgShow=false;
+        this.$apply();
+    }
+
+    onLoad(options) {
+        wx.showLoading({
+          title: '加载中',
+        })
+        this.resetData();
+        wx.getSystemInfo({
+            success: (res) => {
+                this.width=res.windowWidth;
+                this.height=3301*this.width/750;
+                this.$apply();
+            }
+        });
+        api.from_id = options.uid || api.from_id;
+        this.from=options.from;
+        api.checkLogin().then(()=>{
+            this.userInfo = wx.getStorageSync('userInfo');
+            console.log(this.userInfo,this.userInfo.is_tbk,'checkLogin');
+            console.log(this.userInfo.is_tbk!=0,this.createImgShow);
+            if(this.userInfo.is_tbk!=0){
+                if(this.userInfo.display_poster==1){
+                    this.createImgShow=true;
+                }
+            }
+            this.is_tbk = options.is_tbk || this.userInfo.is_tbk;
+            wx.hideLoading()
+            this.$apply();
+        });
+        let mta = require('../common/mta_analysis.js');
+        mta.Page.init();
+    }
+
+    onShareAppMessage(res) {
+        let tbk=this.is_tbk;
+        let title = '米淘联盟招募令来啦---佣金高、爆款多、服务好',
+            uid = this.userInfo.is_tbk ? this.userInfo.uid : api.from_id,
+            path = `/pages/index?uid=${uid}&is_tbk=${tbk}`;
+        if(this.canIShare && res[0].from == 'button'){
+            return {
+                title: title,
+                imageUrl : '../images/activity/share.jpg',
+                path: path,
+                success: res => {
+                    wx.showToast({
+                        title: '转发成功！'
+                    });
+                },
+                fail: res => {
+
+                }
+            };
+        }else{
+            return {
+                title: title,
+                imageUrl : '../images/activity/share.jpg',
+                path: path,
+                success: res => {
+                    wx.showToast({
+                        title: '转发成功！'
+                    });
+                },
+                fail: res => {
+
+                }
+            };
+        }
+    }
+}
+</script>

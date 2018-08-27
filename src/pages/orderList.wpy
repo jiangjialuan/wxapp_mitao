@@ -1,0 +1,232 @@
+<style lang="less">
+.order-page {
+    .red {
+        color: #f04e4c;
+        font-size: 26rpx;
+    }
+    .tabs {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 999;
+    }
+    .order-list {
+        background-color: #f2f3f4;
+        padding-top: 80rpx;
+        .tips{
+            text-align:center;
+            color:#ff3c5c;
+            background:#fff;
+            height:60rpx;
+            line-height:60rpx;
+            margin-top:18rpx;
+        }
+        .order-item {
+            background-color: #fff;
+            margin-top: 20rpx;
+            color:#3d3d3d;
+            .order-summary {
+                font-size:24rpx;
+                line-height:64rpx;
+                padding:0 20rpx;
+                justify-content: space-between;
+                .agency{
+                    border:1px solid #ff3c5c;
+                    border-radius:3px;
+                    height:26rpx;
+                    width:52rpx;
+                    font-size:18rpx;
+                    line-height:29rpx;
+                    text-align:center;
+                    color:#fff;
+                    display:inline-block;
+                    vertical-align:middle;
+                    margin-top:-1px;
+                    background:#ff3c5c;
+
+                }
+            }
+            .goods-item {
+                position: relative;
+                padding: 20rpx;
+                display: flex;
+                justify-content: space-between;
+                .time{
+                    color:#999;
+                    font-size:24rpx;
+                }
+                .goods-img {
+                    margin-right: 30rpx;
+                    width: 140rpx;
+                    height: 140rpx;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    position: relative;
+                    background: #f3f3f4;
+                    border: 1rpx solid #f2f3f4;
+                    image {
+                        width: 140rpx;
+                        height: 140rpx;
+                        display:block;
+                    }
+                }
+                .name {
+                    font-size:26rpx;
+                    overflow:hidden;
+                    width:536rpx;
+                    white-space:nowrap;
+                    text-overflow:ellipsis;
+                }
+                 .price {
+                    font-size: 28rpx;
+                    margin:24rpx 0;
+                    .commission_money {
+                        color:#ff3c5c;
+                        margin-left:24rpx;
+                    }
+                }
+            }
+        }
+    }
+}
+
+</style>
+<template>
+    <view class="order-page">
+        <view class="tabs">
+            <view @tap="changeType('0')" class="tab-item {{type=='0'?'active': ''}}">全部</view>
+            <view @tap="changeType('1')" class="tab-item {{type=='1'?'active': ''}}">订单付款</view>
+            <view @tap="changeType('3')" class="tab-item {{type=='3'?'active': ''}}">订单结算</view>
+            <view @tap="changeType('2')" class="tab-item {{type=='2'?'active': ''}}">订单失效</view>
+        </view>
+        <view class="order-list">
+            <view class="tips">因淘宝数据延迟，故订单数据同步会稍有延迟</view>
+            <block wx:for="{{orderList}}" wx:key="index" wx:for-index="index" wx:for-item="item" wx:if="{{orderList.length > 0}}">
+                <view class="order-item">
+                    <view class="order-summary flex">
+                        <view><text>订单号：{{item.order_sn}}  </text><text class="agency" wx:if="{{item.is_agent==1}}">代理</text></view>
+                        <view>{{orderStatus[item.order_status]}}</view>
+                    </view>
+                    <view class="goods-item">
+                        <view class="goods-img flex layout-center">
+                            <image class="center-block" src="{{item.pict_url}}" />
+                        </view>
+                        <view class="goods-detail">
+                            <view class="name">{{item.goods_title}}</view>
+                            <view class="price">
+                                总额¥{{item.order_money}} <text class="commission_money">{{item.order_status =='3'?'':'预估'}}佣金¥{{item.commission_money}}</text>
+                            </view>
+                            <text class="time">更新时间：{{item.order_status == '3' ? item.settle_time:item.create_time }}</text>
+                        </view>
+                    </view>
+                </view>
+            </block>
+            <view class="no-data" wx:if="{{orderList.length == 0 && !loading}}"> (⊙ˍ⊙) 哎哟，这里空空如也…</view>
+            <view class="loading" wx:if="{{hasNext || loading}}">正在加载中...</view>
+            <view class="no-data" wx:if="{{orderList.length > 0 && !hasNext}}">没有更多数据了</view>
+        </view>
+        <cut></cut>
+    </view>
+</template>
+<script>
+import wepy from 'wepy';
+import store from '../common/store';
+import api from '../common/api';
+import cut from '../components/cut';
+export default class List extends wepy.page {
+    config = {
+        'navigationBarTitleText': '推广订单'
+    };
+    components = { cut };
+    data = {
+        page: 1,
+        hasNext: true,
+        orderList: [],
+        type: store.get('order_type') || '0',
+        loading: false,
+        orderStatus:['','订单付款','订单失效','订单结算'],
+        type: 0,
+        userInfo:''
+    };
+
+    onReachBottom() {
+        if (this.hasNext) {
+            this.getData(this.type);
+        }
+    }
+
+    resetData(){
+        this.page = 1;
+        this.hasNext = true;
+        this.orderList = [];
+        this.loading = false;
+        this.$apply();
+    }
+
+    // 获取订单列表
+    getData(type) {
+        if (this.loading) return;
+        this.loading = true;
+        this.type = type;
+        this.$apply();
+        let uid = wx.getStorageSync('uid'),
+            sdkInfo = wx.getStorageSync('sdk_zbinfo');
+        let data = {
+            id: uid,
+            order_status: type,
+            act: 1,
+            p: this.page
+        };
+
+        api.request({
+            url: api.orderList,
+            data: data
+        }).then(json => {
+            this.orderList = this.orderList.concat(json.list);
+            this.hasNext = this.page < parseInt(json.total_page, 10);
+            this.page++;
+            this.loading = false;
+            this.$apply();
+        });
+    }
+
+    methods = {
+        changeType(type){
+            this.resetData();
+            this.getData(type);
+        },
+    };
+
+    onLoad() {
+        this.page = 1;
+        this.hasNext = true;
+        this.orderList = [];
+        this.$apply();
+        api.checkLogin().then(()=>{
+            this.userInfo = wx.getStorageSync('userInfo');
+            this.$apply();
+            let uid = wx.getStorageSync('uid'),
+                sdkInfo = wx.getStorageSync('sdk_zbinfo');
+            if (!sdkInfo) {
+                api.request({
+                    url: api.sdkInfo,
+                    data: {
+                        uid: uid
+                    }
+                }).then(json => {
+                    wx.setStorageSync('sdk_zbinfo', json);
+                    this.getData(this.type);
+                });
+            } else {
+                this.getData(this.type);
+            }
+        });
+
+    }
+    onShow() {
+        this.$com.cut.cut_getInfoGood();
+    }
+}
+</script>

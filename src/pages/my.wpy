@@ -1,0 +1,713 @@
+<style lang="less">
+.my-page {
+    background: #f2f2f2;
+    color:#3d3d3d;
+    font-size:24rpx;
+    .section {
+        background:#fff;
+        margin-top:24rpx;
+
+        .info-item {
+            height:90rpx;
+            padding:0 32rpx 0 32rpx;
+            border-bottom:1rpx solid #eee;
+            display:flex;
+            line-height:90rpx;
+            justify-content:space-between;
+            &:last-child {
+                border-bottom: none;
+            }
+            .item-text {
+                font-size: 28rpx;
+            }
+            .arrow {
+                width: 100rpx;
+                height: 90rpx;
+                line-height:100rpx;
+                display: flex;
+                flex-direction:row;
+                align-content:center;
+                justify-content:flex-end;
+                .textfirst{
+                    font-size:24rpx;
+                    color:#999;
+                }
+                .orderbtn{
+                    margin-top:40rpx;
+                }
+            }
+            .nick-name {
+                color: #999;
+                font-size: 28rpx;
+            }
+        }
+        .todyshouyi{
+               align-items: center;
+               text-align:center;
+               flex-direction:column;
+               display:flex;
+               width:33.33%;
+               border-right:1px solid #ececec;
+               &:second-child{
+               }
+               &:first-child{
+               }
+               &:last-child{
+                 border-right:none;
+                 flex-direction:row;
+                 justify-content:center;
+                 .first{
+                    flex-direction:column;
+                    display:flex;
+                    margin-right:30rpx;
+                 }
+               }
+        }
+        .arrowtixian{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            flex-direction:row;
+            height:60rpx;
+            line-height:60rpx;
+        }
+        .lzbox{display: flex;align-items: flex-end;margin-bottom:12rpx;}
+        .lzphoneBtn{
+            color:#fff;
+            width:124rpx;
+            height:54rpx;
+            line-height:54rpx;
+            font-size:24rpx;
+            border-radius:5rpx;
+            align-items:flex-end;
+            padding:0rpx;
+            border:0rpx;
+            background:#01d14b;
+            &::after{
+            border: 0;
+            }
+
+        }
+    }
+    .user-logo {
+        width: 102rpx;
+        height: 102rpx;
+        border-radius: 102rpx;
+        background: #f3f3f3;
+        vertiacl-align:middle;
+    }
+    .user-info {
+        background:#fff;
+        border-top:1px solid #f2f2f2;
+        .info-more-down{
+                    text-align:center;
+                         background:#ededed;
+                         height:55rpx;
+                         line-height:60rpx;
+                         font-size:24rpx;
+                    }
+        .section{
+            margin-top:0;
+            .info-more-up{
+                display:flex;
+                justify-content:space-between;
+                margin-bottom:40rpx;
+                padding:0rpx 32rpx;
+            }
+            .info-more-middle{
+                display:flex;
+                justify-content:space-between;
+                text:first-child{
+                    font-size:32rpx;
+                    font-weight:bold;
+                    margin-bottom:20rpx;
+                    color:#ff3c5c;
+                }
+                text:last-child{
+                    font-size:24rpx;
+                }
+            }
+
+            &.info-more {
+                padding:40rpx 0rpx;
+                .user-box{
+                    padding:10rpx 0rpx 10rpx 0rpx;
+                    display:inline-block;
+                    width:400rpx;
+                }
+                .user-name{
+                    font-size: 32rpx;
+                    color:#3d3d3d;
+                    font-weight:bold;
+                    margin-bottom:20rpx;
+                }
+                .user-balance{
+                    font-size:24rpx;
+                    color:#999;
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                }
+                .arrow{
+                   width: 160rpx;
+                   border-left: 1rpx solid #eee;
+                   &:after{
+                       border-color: #ff3c5c;
+                       border-color: #ff3c5c;
+                   }
+                }
+            }
+        }
+    }
+    .orderbtn{
+        border-color: #ff3c5c;
+        content: '';
+        width: 16rpx;
+        height: 16rpx;
+        border-top: 2rpx solid #999;
+        border-right: 2rpx solid #999;
+        transform: rotate(45deg);
+    }
+    .login-area {
+        height: 280rpx;
+        margin-top: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        margin: 0;
+        .user-logo{
+            margin-right: 0;
+        }
+        .login-btn {
+            margin-top: 30rpx;
+            width: 180rpx;
+            height: 60rpx;
+            line-height: 60rpx;
+            text-align: center;
+            border: 1rpx solid #dedfe0;
+            border-radius: 6rpx;
+            background: #fff;
+            font-size:24rpx;
+        }
+    }
+    .sectionChild{
+        padding:26rpx;
+        display:flex;
+        flex-direction:row;
+        align-items:center;
+        justify-content:center;
+        .sectionBlock{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            width:50%;
+            text:first-child{
+                margin-bottom:20rpx;
+                display:block;
+                font-weight:bold;
+                font-size:32rpx;
+                color:#3d3d3d;
+            }
+            text:last-child{
+                font-size:24rpx;
+            }
+        }
+    }
+    .pop{
+        position:absolute;
+        padding: 40rpx 60rpx 60rpx;
+        border-radius: 5rpx;
+        z-index: 10;
+        background: #fff;
+        top: 30rpx;
+        left: 50%;
+        transform: translate(-50%,0);
+        .close-btn{
+            width: 100rpx;
+            height: 100rpx;
+            position: absolute;
+            right: 0;
+            top: 0;
+            justify-content:center;
+            image{
+                width: 52rpx;
+                height: 52rpx;
+            }
+        }
+        .pop-title{
+            color:#555;
+            font-size: 40rpx;
+            margin-bottom: 30rpx;
+            text-align: center;
+        }
+        .sub-title{
+            color:#999;
+            font-size: 24rpx;
+            margin-bottom: 52rpx;
+            text-align: center;
+        }
+        .input-txt, .confirm-btn{
+            width: 564rpx;
+            height: 90rpx;
+            line-height: 90rpx;
+            border-radius: 5rpx;
+        }
+        .input-txt{
+            background: #f2f2f2;
+            margin-bottom: 40rpx;
+            input{
+                flex: 1;
+                padding: 0 32rpx;
+            }
+            .code-btn{
+                width:180rpx;
+                text-align:center;
+                border: none;
+                border-left: 3rpx solid #555;
+                height: 48rpx;
+                line-height: 48rpx;
+                color: #555;
+                font-size: 24rpx;
+                border-radius: 0;
+                background:transparent;
+            }
+            &:last-child{
+                margin-bottom: 78rpx;
+            }
+        }
+        .confirm-btn{
+            background: #ea5756;
+            color: #fff;
+            font-size: 36rpx;
+            text-align: center;
+            margin-top: 78rpx;
+            border: none;
+        }
+    }
+
+}
+</style>
+<template>
+    <view class="my-page">
+        <view class="section login-area" wx:if="{{!userInfo.name}}">
+            <image src="../images/user-logo.png" class="user-logo"></image>
+            <button open-type="getUserInfo" bindgetuserinfo="userLogin" class="login-btn" wx:if="{{canIUse}}">登录</button>
+            <button class="login-btn" @tap="userLogin" wx:else>登录</button>
+        </view>
+        <view class="user-info" wx:if="{{userInfo.name}}">
+            <view class="section info-more">
+                    <view class="info-more-up">
+                        <view><image src="{{userInfo.head_pic}}" class="user-logo" /></view>
+                        <view class="user-box">
+                            <view class="user-name">{{userInfo.name}}</view>
+                            <view class="user-balance" wx:if="{{userInfo.has_phone==0}}">验证手机可免费获取新订单短信通知</view>
+                            <view class="user-balance" wx:else>订单通知将发送至：{{hasphone}} </view>
+                        </view>
+                        <view class="lzbox">
+                            <button  wx:if="{{userInfo.has_phone==0}}" class="lzphoneBtn" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">验证手机</button>
+                            <button  wx:else class="lzphoneBtn" style="opacity:0;"> </button>
+                        </view>
+
+                    </view>
+                    <view class="info-more-middle">
+                        <view class="todyshouyi">
+                            <text>￥{{userInfo.current_month_earning}}</text>
+                            <text>本月预估收益</text>
+                        </view>
+                        <view class="todyshouyi">
+                            <text>￥{{userInfo.pre_month_earning}}</text>
+                            <text>上月预估收益</text>
+                        </view>
+                        <view class="todyshouyi" @tap="redeem">
+                            <view class="first" >
+                                <text>￥{{userInfo.balance}}</text>
+                                <text>可提现</text>
+                            </view>
+                            <view class="orderbtn"></view>
+                        </view>
+                    </view>
+            </view>
+            <view class="info-more-down">每月21日可提现上月收益，本月收益可在下月21号提现</view>
+        </view>
+        <view class="section">
+            <navigator class="info-item"  url="/pages/orderList">
+                <view class="item-text">订单详细</view>
+                <view class="arrow"><text class="textfirst">详情</text><text class="orderbtn"></text></view>
+            </navigator>
+            <view class="sectionChild">
+                <view class="sectionBlock">
+                    <text>{{userInfo.today_order}}</text>
+                    <text>今日新增订单</text>
+                </view>
+                <view class="sectionBlock">
+                    <text>{{userInfo.total_order}}</text>
+                    <text>总订单数</text>
+                </view>
+            </view>
+            <view class="sectionChild" wx:if="{{userInfo.is_tbk==1}}">
+                <view class="sectionBlock">
+                    <text>{{userInfo.agent_today_order}}</text>
+                    <text>代理今日新增订单</text>
+                </view>
+                <view class="sectionBlock">
+                    <text>{{userInfo.agent_total_order}}</text>
+                    <text>代理总订单数</text>
+                </view>
+            </view>
+        </view>
+        <view class="section" wx:if="{{userInfo.is_tbk==1}}">
+            <navigator class="info-item"  url="/pages/activity">
+                <view class="item-text">邀请预览</view>
+                <view class="arrow"><text class="textfirst">去邀请</text><text class="orderbtn"></text></view>
+            </navigator>
+            <view class="sectionChild">
+                <view class="sectionBlock">
+                    <text>{{userInfo.today_invite}}</text>
+                    <text>今日邀请人数</text>
+                </view>
+                <view class="sectionBlock">
+                    <text>{{userInfo.total_invite}}</text>
+                    <text>总邀请数</text>
+                </view>
+            </view>
+        </view>
+        <view class="pop {{isShow ? '' : 'hidden'}}">
+            <view class="close-btn flex" @tap="close">
+                <image src="../images/close.png"/>
+            </view>
+            <view class="pop-title">成为淘客</view>
+            <view class="sub-title" >为了获得推广权限和保障佣金权益，请验证手机号</view>
+            <view class="input-txt flex">
+                <input type="number" placeholder="请填写您的手机号" value="{{phoneNumber}}" @input="handlePhoneNumber" focus="{{isShow}}"/>
+            </view>
+            <view class="input-txt flex">
+                <input type="number" placeholder="请填写短信验证码" value="{{codeNumber}}" @input="handleCodeNumber"/>
+                <button class="code-btn" @tap="sendCode" disabled="{{codeDisabled}}" plain="true">{{codeTxt}}</button>
+            </view>
+            <button class="confirm-btn" @tap="confirm" disabled="{{disabled}}" plain="true">提交</button>
+        </view>
+        <cut></cut>
+    </view>
+</template>
+<script>
+import wepy from 'wepy';
+import api from '../common/api';
+import store from '../common/store';
+import cut from '../components/cut';
+let max = 30, interval = null;
+export default class My extends wepy.page {
+    config = {
+        'navigationBarTitleText': '米淘联盟',
+        'enablePullDownRefresh': true,
+    };
+
+    data = {
+        canIUse: wx.canIUse && wx.canIUse('button.open-type.getUserInfo') || false,
+        userInfo: '',
+        isShow: false,
+        phoneNumber: '',
+        codeNumber: '',
+        disabled: false,
+        codeDisabled: false,
+        codeTxt: '获取验证码',
+        hasphone:'',
+        isClick:true
+    };
+    components = { cut };
+    methods = {
+        close(){
+            this.isShow = false;
+            this.$apply();
+        },
+        redeem(){
+        if(this.isClick){
+            this.isClick=false;
+            this.$apply();
+            if(this.userInfo.balance<1){
+                wx.showModal({
+                    content: '提现金额要满1元哦！快去推广商品赚佣金吧',
+                    showCancel: false,
+                    success:(res)=>{
+                        this.isClick=true;
+                        this.$apply();
+                    }
+                });
+            }else{
+                api.request({
+                   url: api.withdraw,
+                   data: {
+                       act: 1,
+                       money: this.userInfo.balance,
+                       account_type: 2,
+                   },
+                   method: 'POST'
+                }).then(json => {
+                    wx.showModal({
+                        content: '提现成功，快去微信零钱查看吧',
+                        showCancel: false,
+                        success:(res)=>{
+                            this.isClick=true;
+                            this.$apply();
+                        }
+                     });
+                     this.userInfo.balance=0;
+                     this.$apply();
+
+                }).catch((res)=>{
+                    wx.showModal({
+                        content: res,
+                        showCancel: false,
+                        success:(res)=>{
+                            this.isClick=true;
+                            this.$apply();
+                        }
+                    });
+                });
+            }
+        }
+        },
+        userLogin(e) {
+            const login = (code,res) =>{
+                api.request({
+                    url: api.login,
+                    data: {
+                        act: 1,
+                        code: code,
+                        iv: res.iv,
+                        encryptedData: res.encryptedData,
+                        buid: api.buid
+                    },
+                    method: 'POST'
+                }).then(json => {
+                    wx.setStorageSync('tokenkey', json.tokenkey);
+                    api.getUserInfo().then(json => {
+                        this.userInfo = json;
+                        this.hasphone=this.changePhone(this.userInfo.mobile_phone);
+                        this.$apply();
+                        wx.setStorageSync('userInfo', json);
+                    });
+                });
+            };
+            if(!this.canIUse){
+                wepy.login().then((res) => {
+                    let code = res.code;
+                    wx.getUserInfo({
+                        success: (res) => {
+                            login(code,res);
+                        },
+                        fail: () => {
+                            if(wx.openSetting){
+                                wx.openSetting();
+                            }else{
+                                wx.showModal({
+                                    title: '提示',
+                                    showCancel: false,
+                                    content: '由于你取消了授权，请升级到微信最新版本或删掉并搜索"一米好物"进行重新授权'
+                                });
+                            }
+                        }
+                    });
+                });
+            }else{
+                let res = e.detail;
+                if(res.errMsg.indexOf('ok') == -1) return;
+                wepy.login().then(loginRes => {
+                    login(loginRes.code,res);
+                });
+            }
+        },
+        gotoYimi(){
+            wx.navigateToMiniProgram({
+                appId: 'wx13aa8967ff2ac633'
+            });
+        },
+        openPop(){
+            this.isShow = true;
+            this.$apply();
+        },
+        handlePhoneNumber(e) {
+            this.phoneNumber = e.detail.value;
+            this.$apply();
+        },
+        handleCodeNumber(e) {
+            this.codeNumber = e.detail.value;
+            this.$apply();
+        },
+        getPhoneNumber(e) {
+            wepy.login()
+                .then(res => {
+                    api.request({
+                        url: api.bind_wx_phone,
+                        data: {
+                            act: 1,
+                            tokenkey: wx.getStorageSync('tokenkey'),
+                            code: res.code,
+                            iv: e.detail.iv,
+                            encryptedData: e.detail.encryptedData,
+                            buid: api.buid
+                        },
+                        method:'post'
+                    }).then(json => {
+                        console.log(json.mobile_phone!='');
+                        if(json.mobile_phone!=''){
+                            wx.showToast({
+                                title: "验证成功！"
+                            });
+                            this.hasphone=this.changePhone(json.mobile_phone);
+                            this.userInfo.has_phone=1;
+                            this.$apply();
+                        }else{
+                            this.isShow = true;
+                            this.$apply();
+                        };
+                    }).catch(msg=>{
+                        console.log(msg,"fdfdfdfd");
+                    });
+                })
+
+        },
+        sendCode(){
+            if (!this.validateCode()) return;
+            this.codeDisabled = true;
+            this.$apply();
+            api.request({
+                url: api.sendCode,
+                data: {
+                    act: 5,
+                    mobile_phone: this.phoneNumber
+                }
+            }).then(json => {
+                this.codeTxt = `${max}s`;
+                this.renderCode();
+                this.$apply();
+            }).catch(msg=>{
+                this.codeDisabled = false;
+                this.$apply();
+                wx.showToast({
+                    image: '../images/fail.png',
+                    title: msg
+                });
+            });
+        },
+        confirm(){
+            let uid = api.from_id ? api.from_id : this.userInfo.uid;
+            if (!this.validate() || this.disabled) return;
+            this.disabled = true;
+            this.$apply();
+            api.request({
+                url: api.join,
+                data: {
+                    act: 1,
+                    mobile_phone: this.phoneNumber,
+                    ticket_code: this.codeNumber,
+                    from_uid: uid
+                },
+                method: 'POST'
+            }).then(json => {
+                wx.showToast({
+                    title: '手机验证成功！'
+                });
+                this.hasphone=this.changePhone(this.phoneNumber);
+                this.userInfo.is_tbk = json.is_tbk;
+                this.userInfo.has_phone=1;
+                this.is_tbk=json.is_tbk;
+                this.isShow = false;
+                this.disabled = false;
+                this.$apply();
+                wx.setStorageSync('userInfo',this.userInfo);
+                wx.switchTab({
+                    url:'/pages/index'
+                });
+            }).catch(msg=>{
+                this.disabled = false;
+                this.$apply();
+                wx.showToast({
+                    image: '../images/fail.png',
+                    title: msg
+                });
+            });
+        },
+    }
+
+
+    changePhone(phone){
+         var newPhone=phone.slice(0,3)+'****'+phone.slice(7,11);
+         return newPhone;
+    }
+    validate() {
+        let msg;
+        if (!this.phoneNumber) {
+            return wx.showToast({
+                image: '../images/fail.png',
+                title: "请填写您的手机号码！"
+            });
+        }
+        if (!this.codeNumber) {
+            return wx.showToast({
+                image: '../images/fail.png',
+                title: "请填写短信验证码！"
+            });
+        }
+        return true;
+    }
+
+
+    validateCode() {
+        let msg;
+        if (!this.phoneNumber) {
+            return wx.showToast({
+                image: '../images/fail.png',
+                title: "请填写您的手机号码！"
+            });
+        }
+        return true;
+    }
+    renderCode() {
+        interval = setInterval(()=>{
+            max--;
+            this.codeTxt = `${max}s`;
+            if(max <= 0){
+                max = 30;
+                this.codeTxt = '获取验证码';
+                this.codeDisabled = false;
+                clearInterval(interval);
+                interval = null;
+            }
+            this.$apply();
+        },1000);
+    }
+    resetData(){
+            this.isShow = false;
+            this.phoneNumber = '';
+            this.codeNumber = '';
+            this.disabled = false;
+            max = 30;
+            this.codeTxt = '获取验证码';
+            this.codeDisabled = false;
+            clearInterval(interval);
+            interval = null;
+            this.$apply();
+        }
+    onShow() {
+        api.checkLogin().then(()=>{
+            this.userInfo = wx.getStorageSync('userInfo');
+            this.hasphone = this.changePhone(this.userInfo.mobile_phone);
+            this.$com.cut.cut_getInfoGood();
+            this.$apply();
+        });
+    }
+    onLoad(){
+        this.resetData();
+    }
+    onPullDownRefresh(){
+        api.getUserInfo().then(json => {
+            this.userInfo = json;
+            this.$apply();
+            wx.setStorageSync('userInfo', json);
+            wx.stopPullDownRefresh();
+        });
+    }
+}
+</script>

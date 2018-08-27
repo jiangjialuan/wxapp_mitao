@@ -1,0 +1,364 @@
+<style lang="less">
+.search-page {
+    background: #f2f2f2;
+    .top-bar{
+        position:fixed;
+        top:0;
+        left:0;
+        right:0;
+        z-index:10;
+        padding-bottom:18rpx;
+        background:#f2f2f2;
+    }
+    .search-input{
+        padding:20rpx 24rpx;
+        background:#fff;
+        .input-txt{
+            border-radius:5rpx;
+            height:60rpx;
+            background:#f2f2f2;
+            line-height:60rpx;
+            color:#999;
+            font-size:24rpx;
+            flex:1;
+            color:#333;
+            image{
+                width:28rpx;
+                height:28rpx;
+                margin:0 12rpx;
+                vertical-align:middle;
+            }
+            .del-btn{
+                width:60rpx;
+                height:60rpx;
+                image{
+                    width:36rpx;
+                    height:36rpx;
+                }
+            }
+        }
+        .search-btn{
+            width:102rpx;
+            height:60rpx;
+            line-height:60rpx;
+            background:#c5c5c5;
+            border-radius:5rpx;
+            text-align:center;
+            margin-left:24rpx;
+            &.active{
+                background:#ff3c5c;
+                color:#fff;
+            }
+        }
+    }
+    .class-bar{
+        height:82rpx;
+        line-height:82rpx;
+        background:#fff;
+        white-space:nowrap;
+        overflow:hidden;
+        overflow-x:auto;
+        width:100%;
+        .class-item{
+            color:#555;
+            margin:0 36rpx;
+            float:left;
+            &.active{
+                color:#ff3c5c;
+            }
+        }
+    }
+    .activity-btn{
+        position: fixed;
+        height: 68rpx;
+        line-height: 68rpx;
+        width: 162rpx;
+        background: rgba(255,60,92,.85);
+        border-top-left-radius: 34rpx;
+        border-bottom-left-radius: 34rpx;
+        color: #fff;
+        font-size: 28rpx;
+        bottom: 52rpx;
+        right: 0;
+        text-align: center;
+    }
+    .goods-list{
+        padding-top:118rpx;
+    }
+    .no-data{
+        image{
+            margin-top: 200rpx;
+            width:200rpx;
+            height:165rpx;
+        }
+    }
+    .activity-btn{
+            position: fixed;
+            height: 68rpx;
+            line-height: 68rpx;
+            width: 162rpx;
+            background: rgba(255,60,92,.85);
+            border-top-left-radius: 34rpx;
+            border-bottom-left-radius: 34rpx;
+            color: #fff;
+            font-size: 28rpx;
+            bottom: 152rpx;
+            right: 0;
+            text-align: center;
+    }
+}
+
+</style>
+<template>
+    <view class="search-page">
+        <view class="top-bar">
+            <view class="search-input flex">
+                <view class="input-txt flex">
+                    <image src="../images/search.png"/>
+                    <input class="input-txt" placeholder="搜索商品" focus="{{focus}}" value="{{key}}" @input="handleKeyInput" confirm-type="search" @confirm="search"/>
+                    <view class="del-btn" wx:if="{{key}}" @tap="clearKey">
+                        <image src="../images/del.png"/>
+                    </view>
+                </view>
+                <view class="search-btn {{key?'active':''}}" @tap="search" wx:if="{{key}}">搜索</view>
+                <view class="search-btn" @tap="cancelSearch" wx:else>取消</view>
+            </view>
+        </view>
+        <scroll-view class="goods-list clearfix" style="height:{{height}}px" scroll-y @scrolltolower="loadMore">
+            <view class="goods-item clearfix" wx:for="{{goodsInfo.list}}" wx:for-index="index" wx:for-item="item" wx:key="index">
+                <view class="clearfix" @tap="gotoDetail({{item.bid}})">
+                    <image class="item-image fl" src="{{item.image}}" mode="aspectFill"/>
+                    <view class="item-title text-over-ellipsis">{{item.wname}}</view>
+                    <view class="item-price" wx:if="{{item.coupon}}">券后价 <text class="real-price">¥{{item.price_coupon}}</text>现价¥{{item.price}}</view>
+                    <view class="item-price" wx:else>现价<text class="real-price">¥{{item.price}}</text></view>
+                    <view class="item-num">月销量{{item.volume}}件</view>
+                </view>
+                <button class="share-btn" open-type="share" plain="true" wx:if="{{userInfo.is_tbk && canIShare}}" data-id="{{item.bid}}">
+                    <image src="../images/share-mini.png"/>返¥{{item.commission_money}}
+                </button>
+                <view class="share-btn" @tap="shareTips" wx:if="{{userInfo.is_tbk && !canIShare}}">
+                    返¥{{item.commission_money}}
+                </view>
+            </view>
+            <view class="loading" wx:if="{{goodsInfo.hasNext && loading}}">正在加载中...</view>
+            <view class="no-data" wx:if="{{goodsInfo.list.length == 0 && !goodsInfo.hasNext}}">
+                <image src="../images/no-data.png"/>
+                <view>没搜到呢，换个关键词试试吧</view>
+            </view>
+            <view class="no-data" wx:if="{{goodsInfo.list.length > 0 && !goodsInfo.hasNext}}">没有更多数据了</view>
+        </scroll-view>
+        <navigator class="activity-btn" url="/pages/activity" wx:if="{{userInfo.is_tbk==2?false:goodsInfo.list.length>0?true:false}}">
+                 推广赚佣金
+        </navigator>
+        <cut></cut>
+    </view>
+</template>
+<script>
+import wepy from 'wepy';
+import api from '../common/api';
+import store from '../common/store';
+import cut from '../components/cut';
+export default class Search extends wepy.page {
+    config = {
+        'navigationBarTitleText': '搜索',
+    };
+    components = { cut };
+    data = {
+        key: '',
+        goodsInfo: {
+            list: [],
+            page: 1,
+            hasNext: true
+        },
+        loading: false,
+        focus: false,
+        userInfo: {},
+        height: 0,
+        canIShare: wx.canIUse && wx.canIUse('button.open-type.share') || false,
+    };
+
+    methods = {
+        clearKey(){
+            this.key = "";
+            this.$apply();
+        },
+        handleKeyInput(e){
+            this.key = e.detail.value;
+            this.$apply();
+        },
+        gotoDetail(bid){
+            let uid = this.userInfo.is_tbk ? this.userInfo.uid : api.from_id;
+            wx.navigateTo({
+                url: `/pages/detail?goods_id=${bid}&uid=${uid}`
+            });
+        },
+        cancelSearch(){
+            let uid = this.userInfo.is_tbk ? this.userInfo.uid : api.from_id;
+            wx.switchTab({
+                url: `/pages/index?uid=${uid}`
+            });
+        },
+        search(){
+            if(!this.key){
+                api.showFail('请输入搜索关键词');
+            }else{
+                this.resetData();
+                this.getGoodsList();
+            }
+        },
+        loadMore(){
+            if (this.goodsInfo.hasNext) {
+                this.getGoodsList();
+            }
+        }
+    };
+
+    getGoodsList() {
+        if (this.loading) return;
+        this.loading = true;
+        this.$apply();
+        let data = {
+            page: this.goodsInfo.page,
+            gtid: 0,
+            key: this.key
+        };
+        api.request({
+            url: api.goodsList,
+            data: data
+        }).then(json => {
+            this.goodsInfo.list = this.goodsInfo.list.concat(json.list);
+            this.highCommission(this.goodsInfo.page,json.list);
+            this.goodsInfo.hasNext = json.has_next;
+            this.goodsInfo.page++;
+            this.loading = false;
+            this.$apply();
+            wx.hideToast();
+        });
+    }
+    highCommission(page,json) {
+        var j=0;
+        for(var i=0;i<=json.length-1;i++){
+            api.request({
+                 url: api.get_info_by_numiid,
+                 data: {bid: json[i].bid,price:json[i].price}
+            }).then(res => {
+               if(res.price){
+                   for(var k=0;k<=this.goodsInfo.list.length-1;k++){
+                        if(this.goodsInfo.list[k].bid==res.bid){
+                            this.goodsInfo.list[k].coupon=res.coupon;
+                            this.goodsInfo.list[k].commission_money=res.commission_money;
+                            this.goodsInfo.list[k].price_coupon=res.price_coupon;
+                            this.goodsInfo.list[k].price=res.price;
+                            this.$apply();
+                            break;
+                        }
+                   }
+               }
+               j++;
+            }).catch();
+        }
+    }
+
+    showLoading() {
+        wx.showToast({
+            title: '正在加载...',
+            icon: 'loading',
+            duration: 10000
+        });
+    }
+
+    resetData(){
+        this.goodsInfo = {
+            list: [],
+            page: 1,
+            hasNext: true
+        };
+        this.loading = false;
+        this.$apply();
+    }
+    onShow() {
+        this.$com.cut.cut_getInfoGood();
+    }
+    onLoad(options) {
+        this.resetData();
+        api.from_id = options.uid || api.from_id;
+        this.key = options.key || '';
+        wx.getSystemInfo({
+            success: (res) => {
+                this.height = res.windowHeight - res.windowWidth / 750 * 118;
+                this.$apply();
+                setTimeout(()=>{
+                    if(this.key){
+                        this.getGoodsList();
+                    }else{
+                        this.focus = true;
+                        this.$apply();
+                    }
+                },800);
+            }
+        });
+        api.checkLogin().then(()=>{
+            this.userInfo = wx.getStorageSync('userInfo');
+            this.$apply();
+        });
+    }
+
+    onShareAppMessage(res) {
+        let uid = this.userInfo.is_tbk ? this.userInfo.uid : api.from_id;
+        if(this.canIShare && res.from == 'button'){
+        var shareTile,shareImg,sharePath;
+        if(res.target.id=='copyShare'){
+             let bid=this.$com.cut.propData.bid,
+               wname=this.$com.cut.propData.wname,
+               price_coupon=this.$com.cut.propData.price_coupon;
+             shareTile=`【¥${price_coupon}】${wname}`;
+             shareImg=this.$com.cut.propData.image;
+             sharePath= `/pages/detail?goods_id=${bid}&uid=${uid}`;
+        }else{
+            let title = api.title,
+            dataset = res.target.dataset,
+            currentItem = this.goodsInfo.list.filter(item => item.bid == dataset.id)[0],
+            {wname,image,bid,price_coupon} = currentItem;
+            shareTile=`【¥${price_coupon}】${wname}`;
+            shareImg=image;
+            sharePath=`/pages/detail?goods_id=${bid}&uid=${uid}`;
+         }
+
+            return {
+                title: shareTile,
+                imageUrl : shareImg,
+                path: sharePath,
+                success: res => {
+                    wx.showToast({
+                        title: '转发成功！'
+                    });
+                },
+                fail: res => {
+                    let msg = '转发失败！';
+                    if (/cancel/ig.test(res.errorMsg) > -1) {
+                        msg = '转发取消！'
+                    }
+                    api.showFail(msg);
+                }
+            };
+        }else{
+            return {
+                title: api.title,
+                path: `/pages/search?uid=${uid}&key=${this.key}`,
+                success: res => {
+                    wx.showToast({
+                        title: '转发成功！'
+                    });
+                },
+                fail: res => {
+                    let msg = '转发失败！';
+                    if (/cancel/ig.test(res.errorMsg) > -1) {
+                        msg = '转发取消！'
+                    }
+                    api.showFail(msg);
+                }
+            };
+        }
+    }
+}
+</script>

@@ -1,0 +1,390 @@
+<style lang="less">
+.index-page {
+    background: #f2f2f2;
+    .top-bar{
+        position:fixed;
+        top:0;
+        left:0;
+        right:0;
+        z-index:10;
+        padding-bottom:18rpx;
+        background:#f2f2f2;
+    }
+    .search-input{
+        background:#ff3c5c;
+        padding:20rpx 24rpx;
+        .input-txt{
+            border-radius:5rpx;
+            height:60rpx;
+            background:#fff;
+            text-align:center;
+            line-height:60rpx;
+            color:#999;
+            font-size:24rpx;
+            image{
+                width:28rpx;
+                height:28rpx;
+                margin-right:4rpx;
+                vertical-align:middle;
+            }
+        }
+    }
+    .class-bar{
+        height:82rpx;
+        line-height:82rpx;
+        background:#fff;
+        scroll-view{
+            white-space:nowrap;
+            width:100%;
+            height:100%;
+        }
+        .class-item{
+            color:#555;
+            padding:0 36rpx;
+            display:inline-block;
+            &.active{
+                color:#ff3c5c;
+            }
+        }
+    }
+    .item-title{
+        .icon-tmall{
+            width:28rpx;
+            height:28rpx;
+            margin-right:8rpx;
+            vertical-align:middle;
+        }
+    }
+    .activity-btn{
+        position: fixed;
+        height: 68rpx;
+        line-height: 68rpx;
+        width: 162rpx;
+        background: rgba(255,60,92,.85);
+        border-top-left-radius: 34rpx;
+        border-bottom-left-radius: 34rpx;
+        color: #fff;
+        font-size: 28rpx;
+        bottom: 90rpx;
+        right: 0;
+        text-align: center;
+    }
+}
+
+</style>
+<template>
+    <view class="index-page">
+        <view class="top-bar">
+            <view class="search-input">
+                <view class="input-txt" @tap="gotoSearch"><image src="../images/search.png"/>搜索商品</view>
+            </view>
+            <view class="class-bar">
+                <scroll-view scroll-x scroll-into-view="{{scrollIntoView}}" scroll-with-animation="true">
+                    <view wx:for="{{classList}}" wx:for-index="classIndex" wx:for-item="classItem" wx:key="classIndex" class="class-item {{gtid == classItem.gtid ? 'active' : ''}}" id="class-item-{{classIndex}}" @tap="changeType({{classItem.gtid}})">{{classItem.name}}</view>
+                </scroll-view>
+            </view>
+        </view>
+        <swiper style="height:{{height}}px;padding-top:200rpx;" @change="swiperChange" current="{{index}}" duration="0">
+            <swiper-item wx:for="{{classList}}" wx:key="classIndex" wx:for-index="classIndex" wx:for-item="classItem" style="height:{{height}}px">
+                <scroll-view class="goods-list clearfix" style="height:{{height}}px" scroll-y=" " @scrolltolower="loadMore" wx:if="{{gtid == classItem.gtid}}">
+                    <view class="goods-item clearfix" wx:for="{{goodsInfo.list}}"  wx:for-index="index" wx:for-item="item" wx:key="index">
+                        <view class="clearfix" @tap.stop="gotoDetail({{item.bid}})">
+                            <image class="item-image fl" src="{{item.image}}" mode="aspectFill"/>
+                            <view class="item-title text-over-ellipsis"><image src="../images/tmall.png" class='icon-tmall' wx:if="{{item.mall == 1}}"/>{{item.wname}}</view>
+                            <view class="item-price" wx:if="{{item.coupon}}">券后价 <text class="real-price">¥{{item.price_coupon}}</text>现价¥{{item.price}}</view>
+                            <view class="item-price" wx:else>现价<text class="real-price">¥{{item.price}}</text></view>
+                            <view class="item-num">月销量{{item.volume}}件</view>
+                        </view>
+                        <button class="share-btn" open-type="share" plain="true" wx:if="{{userInfo.is_tbk && canIShare}}" data-id="{{item.bid}}">
+                            <image src="../images/share-mini.png"/>返¥{{item.commission_money}}
+                        </button>
+                        <view class="share-btn" @tap="shareTips" wx:if="{{userInfo.is_tbk && !canIShare}}">
+                            返¥{{item.commission_money}}
+                        </view>
+                    </view>
+                    <view class="loading" wx:if="{{goodsInfo.hasNext || loading}}">正在加载中...</view>
+                    <view class="no-data" wx:if="{{goodsInfo.list.length > 0 && !goodsInfo.hasNext}}">没有更多数据了</view>
+                </scroll-view>
+            </swiper-item>
+        </swiper>
+        <navigator class="activity-btn" url="/pages/activity" wx:if="{{userInfo.is_tbk==2?false:true}}">
+            推广赚佣金
+        </navigator>
+        <cut></cut>
+    </view>
+
+</template>
+<script>
+import wepy from 'wepy';
+import api from '../common/api';
+import store from '../common/store';
+import loadCode from '../common/loadCode';
+import cut from '../components/cut';
+export default class Index extends wepy.page {
+    config = {
+        'navigationBarTitleText': '米淘联盟',
+        'enablePullDownRefresh': false,
+        'navigationBarTextStyle': 'white',
+        'navigationBarBackgroundColor': '#ff3c5c',
+        'disableScroll':true
+    };
+    components = { cut };
+    data = {
+        classList: [],
+        goodsInfo: {
+            list: [],
+            goodsPriceList:[],
+            page: 1,
+            hasNext: true
+        },
+        gtid: 0,
+        loading: false,
+        userInfo: {},
+        index: 0,
+        height: 0,
+        scrollIntoView: 'class-item-0',
+        canIShare: wx.canIUse && wx.canIUse('button.open-type.share') || false,
+    };
+
+    methods = {
+        swiperChange(e){
+            let {current,source} = e.detail;
+            if(source != "touch") return;
+            this.gtid = this.classList[current].gtid;
+            this.scrollIntoView = `class-item-${current}`;
+            this.$apply();
+            this.changeType();
+        },
+        gotoSearch(){
+            let uid = this.userInfo.is_tbk ? this.userInfo.uid : api.from_id;
+            wx.navigateTo({
+                url: `/pages/search?uid=${uid}`
+            });
+        },
+        gotoDetail(bid){
+            let uid = this.userInfo.is_tbk ? this.userInfo.uid : api.from_id;
+            wx.navigateTo({
+                url: `/pages/detail?goods_id=${bid}&uid=${uid}`
+            });
+        },
+        shareTips(){
+            wx.showModal({
+                title: '提示',
+                showCancel: false,
+                content: '由于微信版本过低，暂不支持该功能，请升级微信或者点击右上角进行转发'
+            });
+        },
+        changeType(id){
+            this.gtid = id;
+            let current = this.classList.findIndex(item => item.gtid == id);
+            this.scrollIntoView = `class-item-${current}`;
+            this.index = current;
+            this.changeType();
+        }
+    };
+
+    changeType(){
+        this.resetData();
+        this.getGoodsList();
+    }
+
+    showLoading() {
+        wx.showToast({
+            title: '正在加载...',
+            icon: 'loading',
+            duration: 10000
+        });
+    }
+
+    resetData(){
+        this.goodsInfo = {
+            list: [],
+            page: 1,
+            hasNext: true
+        };
+        this.$apply();
+    }
+
+    getTypeList(){
+        api.request({
+            url: api.typeList
+        }).then(json => {
+            this.classList = json;
+            this.gtid = json[0].gtid;
+            this.getGoodsList();
+            this.$apply();
+        });
+    }
+
+    loadMore() {
+        if (this.goodsInfo.hasNext) {
+            this.getGoodsList();
+        }
+    }
+
+    getGoodsList() {
+        if (this.loading) return;
+        this.loading = true;
+        this.$apply();
+        let uid = wx.getStorageSync('uid'),
+            sdkInfo = wx.getStorageSync('sdk_zbinfo');
+        let data = {
+            page: this.goodsInfo.page,
+            id: uid,
+            token: sdkInfo.token,
+            sign: sdkInfo.sign,
+            ts: sdkInfo.ts,
+            gtid: this.gtid
+        };
+        api.request({
+            url: api.goodsList,
+            data: data
+        }).then(json => {
+            this.goodsInfo.list = this.goodsInfo.list.concat(json.list);
+            this.highCommission(this.goodsInfo.page,json.list);
+            this.goodsInfo.hasNext = json.has_next;
+            this.goodsInfo.page++;
+            this.loading = false;
+            this.$apply();
+            wx.hideToast();
+        }).catch( () =>{
+            this.loading = false;
+            this.$apply();
+        });
+    }
+    highCommission(page,json) {
+        var j=0;
+        for(var i=0;i<=json.length-1;i++){
+            api.request({
+                 url: api.get_info_by_numiid,
+                 data: {bid: json[i].bid,price:json[i].price}
+            }).then(res => {
+               if(res.price){
+                   for(var k=0;k<=this.goodsInfo.list.length-1;k++){
+                        if(this.goodsInfo.list[k].bid==res.bid){
+                            this.goodsInfo.list[k].coupon=res.coupon;
+                            this.goodsInfo.list[k].commission_money=res.commission_money;
+                            this.goodsInfo.list[k].price_coupon=res.price_coupon;
+                            this.goodsInfo.list[k].price=res.price;
+                            this.$apply();
+                            break;
+                        }
+                   }
+               }
+               j++;
+            }).catch();
+        }
+    }
+
+    onShow() {
+        this.userInfo = wx.getStorageSync('userInfo');
+        this.$com.cut.cut_getInfoGood();
+        let uid = this.userInfo.is_tbk ? this.userInfo.uid : api.from_id;
+        this.$com.cut.cutShow=this.userInfo.is_tbk==0?true:false;
+        this.$apply();
+        loadCode.getCode();
+    }
+
+    onLoad(options) {
+        console.log(options);
+        var scene = decodeURIComponent(options.scene),sceneObj={};
+        if(scene=='undefined'){
+            api.from_id = options.uid || api.from_id;
+        }else{
+            var sceneArr=scene.split(',');
+            for(var i=0;i<sceneArr.length;i++){
+                var s=sceneArr[i].split(':');
+                sceneObj[s[0]]=s[1];
+            }
+            api.from_id = sceneObj.uid || api.from_id;
+            console.log(sceneObj,api.from_id);
+        };
+        this.showLoading();
+        wx.getSystemInfo({
+            success: (res) => {
+                this.height = res.windowHeight - res.windowWidth / 750 * 200;
+                this.$apply();
+            }
+        });
+        api.checkLogin().then(()=>{
+            this.userInfo = wx.getStorageSync('userInfo');
+            this.$apply();
+            let uid = wx.getStorageSync('uid'),
+                sdkInfo = wx.getStorageSync('sdk_zbinfo');
+            if (!sdkInfo) {
+                api.request({
+                    url: api.sdkInfo,
+                    data: {
+                        uid: uid
+                    }
+                }).then(json => {
+                    wx.setStorageSync('sdk_zbinfo', json);
+                    this.getTypeList();
+                });
+            } else {
+                this.getTypeList();
+            }
+        });
+        let mta = require('../common/mta_analysis.js');
+        mta.Page.init();
+    }
+
+    onShareAppMessage(res) {
+        let uid = this.userInfo.is_tbk ? this.userInfo.uid : api.from_id;
+        var shareTile,shareImg,sharePath;
+        if(this.canIShare && res[0].from == 'button'){
+            if(res[0].target.id=='copyShare'){
+                let bid=this.$com.cut.propData.bid,
+                wname=this.$com.cut.propData.wname,
+                price_coupon=this.$com.cut.propData.price_coupon;
+                shareTile=`【¥${price_coupon}】${wname}`;
+                shareImg=this.$com.cut.propData.image;
+                sharePath= `/pages/detail?goods_id=${bid}&uid=${uid}`;
+            }else{
+                let title = api.title,
+                    path = '/pages/index',
+                    dataset = res[0].target.dataset,
+                    currentItem = this.goodsInfo.list.filter(item => item.bid == dataset.id)[0],
+                    {wname,image,bid,price_coupon} = currentItem;
+                shareTile=`【¥${price_coupon}】${wname}`;
+                shareImg=image;
+                sharePath=`/pages/detail?goods_id=${bid}&uid=${uid}`;
+            }
+            return {
+                title: shareTile,
+                imageUrl : shareImg,
+                path: sharePath,
+                success: res => {
+                     wx.showToast({
+                          title: '转发成功！'
+                     });
+                },
+                fail: res => {
+                     let msg = '转发失败！';
+                     if (/cancel/ig.test(res.errorMsg) > -1) {
+                           msg = '转发取消！'
+                     }
+                     api.showFail(msg);
+                }
+            };
+        }else{
+            return {
+                title: api.title,
+                path: `/pages/index?uid=${uid}`,
+                success: res => {
+                    wx.showToast({
+                        title: '转发成功！'
+                    });
+                },
+                fail: res => {
+                    let msg = '转发失败！';
+                    if (/cancel/ig.test(res.errorMsg) > -1) {
+                        msg = '转发取消！'
+                    }
+                    api.showFail(msg);
+                }
+            };
+        }
+    }
+}
+</script>

@@ -1,0 +1,363 @@
+<style lang="less" scoped>
+.hidden{
+    display:none;
+}
+
+.shade{
+        background:#000;
+        opacity:0.75;
+        position:fixed;
+        top:0px;
+        left:0px;
+        width:750rpx;
+        height:100%;
+        z-index:9999;
+        display:none;
+    }
+    .cutbody{
+        position:fixed;
+        z-index:99999;
+        width:76%;
+        left:12%;
+        top:15%;
+        bottom:15%;
+        display:none;
+        .cutMain{
+            background:#fff;
+            border-radius:20rpx;
+            .cutClose{
+                image{
+                    width:73rpx;
+                    hegith:73rpx;
+                }
+            };
+            padding-bottom:30rpx;
+        }
+        .cutImg{
+            image{
+                width:100%;
+                border-radius:20rpx 20rpx 0rpx 0rpx;
+                min-height:100rpx;
+            }
+        }
+        .cutContent{
+            padding:22rpx 22rpx 24rpx 22rpx;
+        }
+        .cutText{
+            font-size:22rpx;
+            color:#999;
+        }
+        .cutTitle{
+            font-size:28rpx;
+            color:#555;
+            margin-bottom:40rpx;
+            text-align:left;
+            overflow:hidden;
+            width:100%;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+        .cutPrice{
+            color:#999;
+            font-size:22rpx;
+            margin-bottom:42rpx;
+            text-align:center;
+            .cutQuang{
+                background:#f87e20;
+                color:#fff;
+                padding:8rpx;
+                border-radius:5rpx;
+                margin-right:12rpx;
+                .cutQL{
+                    padding:0px 8rpx 0px 0px;
+                    border-right:dashed 1px #fff;
+                }
+                .cutQR{
+                    padding:0px 0px 0px 8rpx;
+                }
+            }
+            .cutQuangM{
+                color:#ff5000;
+                font-size:32rpx;
+                margin-right:12rpx;
+            }
+            &.second{
+                text-align:center;
+            }
+        }
+        .cutCopy{
+            background-image:linear-gradient(90deg,#f87e20,#ff5000);
+        }
+        .cutCopy,.cutShare{
+            width:100%;
+            height:70rpx;
+            color:#fff;
+            font-size:28rpx;
+            border:1px solid #ff5000;
+            border-radius:40rpx;
+            margin-bottom:30rpx;
+            text-align:center;
+            line-height:72rpx;
+        }
+        .cutShare{
+            color:#ff5000;
+            background:#fff;
+            image{
+                width:18rpx;
+                height:18rpx;
+                display:inline-block;
+                margin-right:8rpx;
+                vertical-align:middle;
+            }
+            text{
+                display:inline-block;
+            }
+        }
+        .cutClose{
+            text-align:center;
+            padding-top:50rpx;
+            image{
+                width:73rpx;
+                height:73rpx;
+            }
+        }
+
+    }
+    .nogood{
+        text-align:center;
+        padding:0px 40rpx 50rpx;
+        image{
+            width:200rpx;
+            height:165rpx;
+            padding:100rpx 0rpx
+        }
+        text{
+            display:block;
+        }
+        button{
+            border:1px solid #f87e20;
+            color:#f87e20;
+            background-color:#fff;
+        }
+    }
+    .aginShow{
+        display:block;
+    }
+    .textContent{
+        margin-top:-25rpx;
+        text-align:center;
+        color:#999;
+        font-size:20rpx;
+    }
+</style>
+
+<template>
+    <view class="shade {{show}}" ></view>
+    <view class="cutbody {{show}}" wx:if="{{propData.bid}}">
+        <view class="cutMain" >
+            <view class="cutImg" @tap="goDetail({{propData.bid}})" ><image src="{{propData.image}}" mode="aspectFill"  style="height:{{sysH*0.5}}rpx"></image></view>
+            <view class="cutContent">
+                <view class="cutTitle" @tap="goDetail({{propData.bid}})">{{propData.wname}}</view>
+                <view class="cutPrice" wx:if="{{propData.coupon!=0}}">
+                     <text class="cutQuang"><text class="cutQL">券</text><text class="cutQR">{{propData.coupon}}元</text></text>
+                     <text class="cutQuangX">佣金</text>
+                     <text class="cutQuangM">￥{{propData.commission_money}}</text>
+                </view>
+                <view class="cutPrice second" wx:else>
+                     <text class="cutQuangX">佣金</text>
+                     <text class="cutQuangM">￥{{propData.commission_money}}</text>
+                </view>
+                <button class="cutShare"  id="copyShare2" @tap="goActive" wx:if="{{cutShow}}">
+                    <image src="../images/share-mini2.png"></image>
+                    <text>分享赚￥{{propData.commission_money}}</text>
+                </button>
+                <button class="cutShare"  open-type="share" plain="true" id="copyShare"  wx:else>
+                     <image src="../images/share-mini2.png"></image>
+                     <text>分享赚￥{{propData.commission_money}}</text>
+                </button>
+                <view class="cutCopy" @tap="copyT">购买省￥{{shengPrice}}</view>
+            </view>
+            <view class="textContent">交易完成即可得佣金，当月佣金次月21日可提现</view>
+        </view>
+        <view class="cutClose">
+             <image src="../images/cut_close.png" @tap="close"></image>
+        </view>
+
+    </view>
+    <view class="cutbody {{show}}" wx:else>
+        <view class="cutMain nogood">
+             <view><image src="../images/noGood.png"></image></view>
+             <text>抱歉！</text>
+             <text style="margin-bottom:42rpx;">您复制的商品已下架或未设置佣金</text>
+             <button @tap="close" class="cutCopy">我知道了</button>
+        </view>
+    </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import api from '../common/api';
+  export default class User extends wepy.component {
+    onLoad () {
+        //获取系统高度
+        wx.getSystemInfo({
+            success: (res) => {
+                this.sysH=res.windowHeight;
+                this.$apply();
+            }
+        });
+        this.pagesLen = getCurrentPages().length;
+        this.$apply();
+    }
+    data = {
+       propData:{},
+       sysH:0,
+       loading: true,
+       show:'hidden',
+       cutShow:false,
+       shengPrice:'',
+       pagesLen:'',
+       userInfo:''
+    }
+    methods = {
+        close() {
+            this.show='hidden';
+            this.$apply();
+        },
+        show(){
+            this.show='aginShow';
+            this.$apply();
+        },
+        goDetail(bid) {
+            let uid = this.$parent.userInfo.is_tbk ? this.$parent.userInfo.uid : api.from_id;
+            if(this.$parent.pullUpText){
+                var  obj={goods_id:bid,uid:uid};
+                this.$parent.getGoodsInfo(obj);
+                this.show='hidden';
+                this.$apply();
+            }else{
+                wx.navigateTo({
+                    url: `/pages/detail?goods_id=${bid}&uid=${uid}`,
+                    success:()=>{
+                        this.show='hidden';
+                        this.$apply();
+                    }
+                });
+                this.show='hidden';
+                this.$apply();
+            }
+
+        },
+        goActive() {
+             let uid=this.$parent.userInfo.is_tbk ? this.$parent.userInfo.uid : api.from_id;
+             wx.navigateTo({
+                 url: `/pages/activity?from=cut&uid=${uid}`,
+                 success:()=>{}
+             });
+        },
+        copyT() {
+            let uid=this.$parent.userInfo.is_tbk ? this.$parent.userInfo.uid : api.from_id;
+            if(this.$parent.userInfo.is_tbk==0){
+                wx.navigateTo({
+                    url: `/pages/activity?from=cut&uid=${uid}`,
+                    success:()=>{
+                    }
+                });
+            }else{
+                var strClip = this.propData.wname+'\n【券后价】'+this.propData.price_coupon+'元\n【优惠券】'+this.propData.coupon+'元\n----------------\n复制这条信息，￥'+this.propData.tpwd+'￥ ，打开【手机淘宝】即可查看';
+                wx.setClipboardData({
+                  data: strClip,
+                  success: (res)=> {
+                    wx.showToast({
+                         title: '已复制，请打开淘宝购买！'
+                    });
+                  },
+                  fail: function(res) {
+                      wx.showToast({
+                          title: '复制失败！'
+                      });
+                  }
+                })
+            }
+        },
+
+    }
+    getAgin(res) {
+       var urlReg=/http:\/\/\S+[\w\d]/;
+       var tpwdReg=/￥\S+￥/;
+       if(this.$parent.userInfo){
+            var uid = this.$parent.userInfo.is_tbk ? this.$parent.userInfo.uid : api.from_id;
+       }else{
+            var uid = this.userInfo.is_tbk ? this.$parent.userInfo.uid : api.from_id;
+       }
+       var id = wx.getStorageSync('uid'),
+           sdkInfo = wx.getStorageSync('sdk_zbinfo');
+       var smData={
+           uid: uid,
+           id: id,
+           token: sdkInfo.token,
+           sign:sdkInfo.sign,
+           ts:sdkInfo.ts,
+           tokenkey:sdkInfo.tokenkey,
+           short_url:urlReg.exec(res.data)?urlReg.exec(res.data)[0]:'',
+           tpwd:tpwdReg.exec(res.data)?tpwdReg.exec(res.data)[0]:''
+       };
+       api.request({
+           url: api.getInfoShorturl,
+           data: smData
+       }).then(json => {
+           wx.setClipboardData({
+              data: ' ',
+              success: function(res) {},
+              fail:function(re){}
+           })
+           this.propData=json;
+           this.shengPrice=(parseFloat(this.propData.coupon)+parseFloat(this.propData.commission_money)).toFixed(2);
+           this.loading = false;
+           this.show='aginShow';
+           this.cutShow=this.$parent.userInfo.is_tbk==0?true:false;
+           this.$apply();
+       });
+       wx.setClipboardData({
+           data: '',
+           success: function(res) {}
+       })
+       this.$apply();
+    }
+    cut_getInfoGood() {
+        wx.getClipboardData({
+            success: (res)=>{
+                var urlReg=/http:\/\/\S+[\w\d]/;
+                var tpwdReg=/￥\S+￥/;
+                var tpwdReg1=/复制这条信息，￥\S+￥ ，打开【手机淘宝】即可查看/;
+                var flag=tpwdReg1.exec(res.data)?true:false;
+                if(urlReg.exec(res.data)!=null||(tpwdReg.exec(res.data)!=null&&!flag)){
+                    var userInfo = wx.getStorageSync('userInfo');
+                    if(!userInfo){
+                        api.checkLogin(()=>{
+                            this.$apply();
+                            let uid = wx.getStorageSync('uid'),
+                                sdkInfo = wx.getStorageSync('sdk_zbinfo');
+                            if (!sdkInfo) {
+                                 api.request({
+                                     url: api.sdkInfo,
+                                     data: {
+                                         uid: uid
+                                     }
+                                 }).then(json => {
+                                     wx.setStorageSync('sdk_zbinfo', json);
+                                     this.getAgin(res);
+                                 });
+                            } else {
+                                 this.getAgin(res);
+                            }
+                        });
+                    }else{
+                        this.getAgin(res);
+                    }
+                }
+            }
+        })
+    }
+  }
+</script>

@@ -1,0 +1,324 @@
+<style lang='less'>
+.hidden {
+    display: none !important;
+}
+.displayShow{
+
+    display:block;
+}
+
+.loading,
+.no-data {
+    text-align: center;
+    line-height: 72rpx;
+    font-size: 24rpx;
+    color: #999;
+}
+
+:after,
+:before {
+    box-sizing: inherit
+}
+
+.clearfix:after,
+.clearfix:before {
+    content: " ";
+    display: table
+}
+
+.clearfix:after {
+    clear: both
+}
+
+i {
+    font-style: normal
+}
+
+.fl {
+    float: left
+}
+
+.fr {
+    float: right
+}
+
+.flex {
+    display: flex;
+    align-items: center;
+}
+
+.text-over-ellipsis {
+    word-break: break-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.page {
+    display: -webkit-box;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    height: 100%;
+    .page-content {
+        -webkit-overflow-scrolling: touch;
+        overflow: hidden;
+        overflow-y: auto;
+        box-flex: 1;
+        -webkit-box-flex: 1;
+        flex: 1;
+    }
+}
+
+.tabs {
+    height: 80rpx;
+    display: flex;
+    justify-content: space-around;
+    border-bottom: 1rpx solid #eee;
+    border-top: 1rpx solid #eee;
+    background: #fff;
+    .tab-item {
+        text-align: center;
+        font-size: 28rpx;
+        line-height: 80rpx;
+        color: #666;
+        position: relative;
+        width: 100%;
+        &:after {
+            content: "";
+            position: absolute;
+            height: 1rpx;
+            width: 50%;
+            bottom: 1rpx;
+            left: 25%;
+        }
+        &.active {
+            color: #f04e4c;
+            &:after {
+                border-bottom: solid 4rpx #f04e4c;
+            }
+        }
+    }
+}
+
+.goods-list{
+    .goods-item{
+        position:relative;
+        overflow:hidden;
+        background:#fff;
+        padding:12rpx;
+        border-bottom:1rpx solid #ebebeb;
+        .item-image{
+            height:192rpx;
+            width:192rpx;
+            margin-right:24rpx;
+        }
+        .share-btn{
+            height: 60rpx;
+            line-height: 60rpx;
+            background: #ff3c5c;
+            font-size: 26rpx;
+            color: #fff;
+            text-align: center;
+            border:none;
+            border-radius:5rpx;
+            bottom:32rpx;
+            right:12rpx;
+            position:absolute;
+            padding:0 8rpx;
+            font-size:24rpx;
+            image{
+                width:18rpx;
+                height:18rpx;
+                margin-right:8rpx;
+            }
+        }
+        .item-price{
+            color:#999;
+            font-size:22rpx;
+            margin-bottom:4rpx;
+            .real-price{
+                color: #ff3c5c;
+                font-size:32rpx;
+                margin-right:18rpx;
+            }
+        }
+        .item-num{
+            color:#999;
+            font-size:22rpx;
+        }
+        .item-title{
+            margin:16rpx auto 24rpx;
+            color:#666;
+            font-size:26rpx;
+            height:64rpx;
+            line-height:32rpx;
+        }
+    }
+}
+
+page {
+    margin: 0;
+    padding: 0;
+    font-family: "Helvetica Neue", Helvetica, Microsoft Yahei, Hiragino Sans GB, WenQuanYi Micro Hei, sans-serif;
+    font-size: 28rpx;
+    background: #f2f3f4;
+    .page-footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        display: -webkit-box;
+        display: flex;
+        background: #fff;
+    }
+    .btn {
+        font-size: 28rpx;
+        text-align: center;
+        display: inline-block;
+        line-height: 60rpx;
+    }
+    .btn.confirm-btn {
+        color: #fff;
+        background-color: #ff5000;
+        &.copied{
+            background: rgba(255,80,0,.5);
+        }
+    }
+    .btn.disable-btn {
+        color: #999;
+        background-color: #e5e5e5;
+    }
+    .page-footer .btn {
+        display: block;
+        -webkit-box-flex: 1;
+        flex: 1;
+        width: 100%;
+        height: 96rpx;
+        line-height: 96rpx;
+        font-size: 32rpx;
+        border: none;
+        outline: 0;
+        border-radius: 0;
+    }
+    .page-footer .btn.disabled {
+        background: #e5e5e5;
+        color: #999;
+    }
+    .page-footer .return-btn {
+        width: 100rpx;
+        border-top: 1rpx solid #dcdcdc;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAaCAQAAAAHtlR4AAAAnUlEQVQ4y5XU2wmDQBCF4QmxEGMF4mk2YAMm9mINYgGCpIDNw7Coe5uzzMvu8H/o0wokM4/0Ppe3WDDwoMUKh5EFms9oOFDMY2DkIXhZ+R0Q+RVQ+Qk0/1q5B3SuoCKH+NzhwB7NDy4cQYctXudH4MmEJ/dLlcQfaHIeSXK9KPmUyf1KkHBhknhlkNSySNIfVvKueWY6LOhrQPYh+wP9rOEyP8o9dQAAAABJRU5ErkJggg==') no-repeat center;
+        background-size: 32rpx;
+    }
+}
+
+.layer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    overflow: hidden;
+    background: rgba(0, 0, 0, .6);
+}
+
+.popwin {
+    position: fixed;
+    top: 306rpx;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    z-index: 12;
+    .pop-title {
+        text-align: center;
+        font-size: 28rpx;
+        line-height: 96rpx;
+        height: 96rpx;
+        background: #fff;
+        position: relative;
+        border-bottom: 1rpx solid #eee;
+    }
+    .pop-content {
+        flex: 1;
+        height: 100%;
+    }
+    .close_icon {
+        z-index: 10;
+        width: 96rpx;
+        height: 96rpx;
+        position: absolute;
+        right: 0;
+        background-color: transparent;
+        background-position: center;
+        background-size: 28rpx;
+        background-repeat: no-repeat;
+        top: 0;
+        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAQAAADYBBcfAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAAmJLR0QAAKqNIzIAAAAJcEhZcwAACxIAAAsSAdLdfvwAAAAHdElNRQfgDBAQDR2F97pYAAAB6UlEQVQ4y43SbU+NcRwH8M/VRZu5f2Jj3oEXoJutCOXu2rwIYRFJpKgWw9zkVKtohM1TbwDNXZRRHngRZuYBI3eLy4OuOud0Dud8H/322++z/3+//z8YbtdmyEmxYnNcp5EwummtSqvdL5J1OK/UhjD6bI/ARquKop3OgNNh9NY7uwXKrPSgAOvSDdpcCiPeZND/ndqtC5x0kTCCN97bVYB26wStLjEHmUpouRV5L3xWBzjh8mxjDjLlg50C5Zbn0LNOJw9xZa6VhkwmtMIyDzPYOadAi550MxMy6aMdAhWWztNz2sExVzNHsyGvE1ppiVFc0AaapbIHF+WsYVCJPoHWZIfEmvUuHAuG862+UZ8gqWNH9eWOLLzqbF75ZHtSN+nPN1Iif9bPV2vyD+Q/8YoWxAJUWexRcbDHMcQOG1WHKqHHhWHKUcQOGfTSF3WozqXZMJDSlLAhMOGrWlQLPPkXTLMG1+a7E6bVYlM2TcNAryMJu551q3HfbMMmPF0IA30OI3ZA7p8Y9z2hfzzLhIF+jYjtdyPvs73ww1ZsnqNhRGDAQcT2uelfeeFnQmeMEUaBAQ2I7TXif3nuly2oMWMsjFIa8Ue9WwolTafD6J5Sv9W7XZDN0hk1KAuj2DrN7hbFYMy0Cnf+Ap0DkcW494WcAAAAAElFTkSuQmCC);
+    }
+}
+</style>
+<script>
+import wepy from 'wepy';
+import api from './common/api';
+import 'wepy-async-function';
+export default class extends wepy.app {
+    config = {
+        'pages': [
+            'pages/index',
+            'pages/my',
+            'pages/detail',
+            'pages/orderList',
+            'pages/activity',
+            'pages/search'
+        ],
+        'window': {
+            'navigationBarTextStyle': 'black',
+            'backgroundColor': '#fff',
+            'navigationBarBackgroundColor': '#fff',
+        },
+        'debug': true,
+        'tabBar': {
+            'list': [{
+                'pagePath': 'pages/index',
+                'text': '市集',
+                'iconPath': './images/index.png',
+                'selectedIconPath': './images/index_active.png'
+            }, {
+                'pagePath': 'pages/my',
+                'text': '账户',
+                'iconPath': './images/my.png',
+                'selectedIconPath': './images/my_active.png'
+            }],
+            'color': '#333',
+            'selectedColor': '#ff3c5c',
+            'backgroundColor': '#fff',
+            'borderStyle': 'black'
+        }
+    };
+
+    constructor() {
+        super();
+        this.use('promisify');
+        this.use('requestfix');
+    }
+    onLaunch(options) {
+        let mta = require('./common/mta_analysis.js');
+        mta.App.init({
+            "appID":"500528584",
+            "eventID":"500528586",
+            "statPullDownFresh":true,
+            "statShareApp":true,
+            "statReachBottom":true
+        });
+    }
+}
+</script>
